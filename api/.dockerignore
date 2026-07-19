@@ -2,7 +2,6 @@
 **/obj
 .git
 .gitignore
-data
 Data/*.db*
 .env
 .env.*

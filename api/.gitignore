@@ -1,7 +1,8 @@
 bin/
 obj/
-Data/*
-!Data/.gitkeep
+Data/*.db
+Data/*.db-shm
+Data/*.db-wal
 dev-projects/
 .env
 *.db
