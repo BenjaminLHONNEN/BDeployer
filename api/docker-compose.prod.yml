@@ -1,0 +1,49 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BDEPLOYER_UID: ${BDEPLOYER_UID:-10001}
+        BDEPLOYER_GID: ${BDEPLOYER_GID:-10001}
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ApiKey__Key: ${BDEPLOYER_API_KEY:?BDEPLOYER_API_KEY is required}
+      ConnectionStrings__DefaultConnection: Data Source=/app/data/bdeployer.db
+      Deployment__ProjectsRoot: /opt/bdeployer/projects
+      HOME: /home/bdeployer
+    expose:
+      - "8080"
+    group_add:
+      - ${DOCKER_GID:?DOCKER_GID is required}
+    volumes:
+      - api_prod_data:/app/data
+      - /opt/bdeployer/projects:/opt/bdeployer/projects
+      - /opt/bdeployer/ssh:/home/bdeployer/.ssh:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: ${TRAEFIK_NETWORK:-traefik}
+      traefik.http.routers.bdeployer.rule: Host(`bdeployer.bquick.dev`)
+      traefik.http.routers.bdeployer.entrypoints: websecure
+      traefik.http.routers.bdeployer.tls: "true"
+      traefik.http.routers.bdeployer.tls.certresolver: letsencrypt
+      traefik.http.services.bdeployer.loadbalancer.server.port: "8080"
+    networks:
+      - traefik
+
+volumes:
+  api_prod_data:
+
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK:-traefik}

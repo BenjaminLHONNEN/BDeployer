@@ -1,0 +1,9 @@
+bin/
+obj/
+Data/*
+!Data/.gitkeep
+dev-projects/
+.env
+*.db
+*.db-shm
+*.db-wal

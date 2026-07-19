@@ -1,0 +1,10 @@
+**/bin
+**/obj
+.git
+.gitignore
+data
+Data/*.db*
+.env
+.env.*
+README.md
+docker-compose*.yml
